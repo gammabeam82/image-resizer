@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {"": "src/"}
+    },
+    "require": {
+        "php": ">=5.6",
+        "claviska/simpleimage": "^3.3",
+        "symfony/console": "^3.3"
+    }
+}
