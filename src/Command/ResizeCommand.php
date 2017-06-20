@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use claviska\SimpleImage;
+use ZipArchive;
 
 class ResizeCommand extends Command
 {
@@ -19,6 +20,7 @@ class ResizeCommand extends Command
 	const ALLOWED_TYPES = [
 		'image/jpeg', 'image/png'
 	];
+	const ZIP_FILE = 'archive.zip';
 
 	/**
 	 * {@inheritdoc}
@@ -53,6 +55,13 @@ class ResizeCommand extends Command
 				InputOption::VALUE_OPTIONAL,
 				'Directory name for saving processed images.',
 				self::DESTINATION_DIR
+			)
+			->addOption(
+				'zip',
+				null,
+				InputOption::VALUE_OPTIONAL,
+				'',
+				false
 			);
 	}
 
@@ -102,6 +111,11 @@ class ResizeCommand extends Command
 		$io->writeln(['Processing...']);
 		$io->progressStart($filesCount);
 
+		if (false !== $input->getOption('zip')) {
+			$zip = new ZipArchive();
+			$zip->open(sprintf("%s/%s/%s", $directory, self::DESTINATION_DIR, self::ZIP_FILE), ZIPARCHIVE::CREATE);
+		}
+
 		foreach ($originalFiles as $file) {
 			$image = new SimpleImage();
 
@@ -112,6 +126,11 @@ class ResizeCommand extends Command
 					->fromFile($file)
 					->bestFit($input->getOption('maxWidth'), $input->getOption('maxHeight'))
 					->toFile($filename);
+
+				if (false !== isset($zip)) {
+					$zip->addFile($filename, basename($file));
+				}
+
 			} catch (\Exception $e) {
 				$io->error(sprintf("File processing error %s: %s", basename($file), $e->getMessage()));
 				return;
@@ -120,6 +139,10 @@ class ResizeCommand extends Command
 			$io->progressAdvance(1);
 
 			unset($image);
+		}
+
+		if (false !== isset($zip)) {
+			$zip->close();
 		}
 
 		$event = $stopwatch->stop('resize');
