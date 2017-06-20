@@ -2,6 +2,7 @@
 
 namespace Command;
 
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -69,6 +70,9 @@ class ResizeCommand extends Command
 			return;
 		}
 
+		$stopwatch = new Stopwatch();
+		$stopwatch->start('resize');
+
 		$io->writeln(['Fetching data...']);
 
 		$path = sprintf("%s/%s", $directory, $input->getOption('destinationDir'));
@@ -118,7 +122,11 @@ class ResizeCommand extends Command
 			unset($image);
 		}
 
+		$event = $stopwatch->stop('resize');
+
+		$time = round(($event->getDuration() / 1000), 2);
+
 		$io->progressFinish();
-		$io->success('Done!');
+		$io->success(sprintf("Done in %s sec.", $time));
 	}
 }
