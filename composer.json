@@ -1,6 +1,7 @@
 {
+    "license": "MIT",
     "autoload": {
-        "psr-4": {"": "src/"}
+        "psr-4": {"Gammabeam82\\Resizer\\": "src/"}
     },
     "require": {
         "php": ">=5.6",

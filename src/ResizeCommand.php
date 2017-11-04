@@ -1,6 +1,6 @@
 <?php
 
-namespace Command;
+namespace Gammabeam82\Resizer;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Console\Command\Command;
